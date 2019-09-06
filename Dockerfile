@@ -1,3 +1,4 @@
+FROM perconalab/pmm-server:2.0.0-beta6 AS pmm
 FROM ubuntu:16.04
 WORKDIR /opt
 USER root
@@ -28,8 +29,6 @@ RUN mkdir -p \
     /usr/pgsql-10 \
     /usr/local/percona \
     /var/run/supervisor
-COPY packages/consul /usr/sbin/
-COPY packages/node_exporter-0.18.1.linux-amd64/node_exporter /usr/sbin/
 COPY packages/prometheus-2.12.0.linux-amd64/prometheus /usr/sbin/
 COPY packages/prometheus-2.12.0.linux-amd64/prometheus /usr/sbin/prometheus1
 COPY packages/prometheus-2.12.0.linux-amd64/promtool /usr/bin
@@ -37,20 +36,15 @@ COPY packages/prometheus-2.12.0.linux-amd64/consoles /usr/share/prometheus/
 COPY packages/prometheus-2.12.0.linux-amd64/consoles /usr/share/prometheus1/
 COPY packages/prometheus-2.12.0.linux-amd64/console_libraries /usr/share/prometheus/
 COPY packages/prometheus-2.12.0.linux-amd64/console_libraries /usr/share/prometheus1/
-COPY bin/qan-api2 /usr/sbin/percona-qan-api2
-COPY bin/pmm-managed /usr/sbin/pmm-managed
-COPY bin/pmm-agent /usr/sbin/pmm-agent
-COPY bin/pmm-configurator /usr/sbin/pmm-configurator
-COPY bin/mysqld_exporter /usr/local/percona/
-COPY bin/node_exporter /usr/local/percona/
-COPY bin/mongodb_exporter /usr/local/percona/
-COPY bin/proxysql_exporter /usr/local/percona/
-COPY bin/postgres_exporter /usr/local/percona/
-COPY bin/mysqld_exporter /usr/bin/
-COPY bin/node_exporter /usr/bin/
-COPY bin/mongodb_exporter /usr/bin/
-COPY bin/proxysql_exporter /usr/bin/
-COPY bin/postgres_exporter /usr/bin/
+COPY --from=pmm /usr/sbin/percona-qan-api2 /usr/sbin/percona-qan-api2
+COPY --from=pmm /usr/sbin/pmm-managed /usr/sbin/pmm-managed
+COPY --from=pmm /usr/sbin/pmm-agent /usr/sbin/pmm-agent
+COPY --from=pmm /usr/sbin/pmm-configurator /usr/sbin/pmm-configurator
+COPY --from=pmm /usr/bin/mysqld_exporter /usr/bin/
+COPY --from=pmm /usr/bin/node_exporter /usr/bin/
+COPY --from=pmm /usr/bin/mongodb_exporter /usr/bin/
+COPY --from=pmm /usr/bin/proxysql_exporter /usr/bin/
+COPY --from=pmm /usr/bin/postgres_exporter /usr/bin/
 COPY packages/pgsql-10 /usr/pgsql-10
 COPY packages/pmm-server-2.0.0-beta6 /usr/share/pmm-server
 COPY packages/grafana-dashboards-2.0.0-beta6 /usr/share/percona-dashboards

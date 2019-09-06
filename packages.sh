@@ -20,9 +20,6 @@ CWD=$(pwd)
 wget https://github.com/prometheus/node_exporter/releases/download/v0.18.1/node_exporter-0.18.1.linux-amd64.tar.gz
 tar xzf node_exporter-0.18.1.linux-amd64.tar.gz
 rm -rf node_exporter-0.18.1.linux-amd64.tar.gz
-wget https://releases.hashicorp.com/consul/0.8.5/consul_0.8.5_linux_amd64.zip
-unzip consul_0.8.5_linux_amd64.zip
-rm -rf consul_0.8.5_linux_amd64.zip
 wget https://get.enterprisedb.com/postgresql/postgresql-10.10-1-linux-x64-binaries.tar.gz
 tar xzf postgresql-10.10-1-linux-x64-binaries.tar.gz
 rm -rf postgresql-10.10-1-linux-x64-binaries.tar.gz
