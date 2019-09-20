@@ -1,4 +1,4 @@
-FROM perconalab/pmm-server:2.0.0-beta6 AS pmm
+FROM percona/pmm-server:2 AS pmm
 FROM ubuntu:16.04
 WORKDIR /opt
 USER root
@@ -16,6 +16,8 @@ RUN mkdir -p \
     /usr/share/orchestrator \
     /var/lib/prometheus \
     /var/log/supervisor \
+    /usr/local/percona/pmm2/exporters \
+    /usr/local/percona/pmm2/config
     /usr/share/prometheus \
     /usr/share/prometheus1 \
     /usr/share/percona-dashboards \
@@ -39,20 +41,20 @@ COPY packages/prometheus-2.12.0.linux-amd64/console_libraries /usr/share/prometh
 COPY --from=pmm /usr/sbin/percona-qan-api2 /usr/sbin/percona-qan-api2
 COPY --from=pmm /usr/sbin/pmm-managed /usr/sbin/pmm-managed
 COPY --from=pmm /usr/sbin/pmm-agent /usr/sbin/pmm-agent
-COPY --from=pmm /usr/sbin/pmm-configurator /usr/sbin/pmm-configurator
-COPY --from=pmm /usr/bin/mysqld_exporter /usr/bin/
-COPY --from=pmm /usr/bin/node_exporter /usr/bin/
-COPY --from=pmm /usr/bin/mongodb_exporter /usr/bin/
-COPY --from=pmm /usr/bin/proxysql_exporter /usr/bin/
-COPY --from=pmm /usr/bin/postgres_exporter /usr/bin/
+COPY --from=pmm /usr/local/percona/pmm2/exporters/mysqld_exporter /usr/local/percona/pmm2/exporters/
+COPY --from=pmm /usr/local/percona/pmm2/exporters/node_exporter /usr/local/percona/pmm2/exporters/
+COPY --from=pmm /usr/local/percona/pmm2/exporters/mongodb_exporter /usr/local/percona/pmm2/exporters/
+COPY --from=pmm /usr/local/percona/pmm2/exporters/proxysql_exporter /usr/local/percona/pmm2/exporters/
+COPY --from=pmm /usr/local/percona/pmm2/exporters/postgres_exporter /usr/local/percona/pmm2/exporters/
+COPY --from=pmm /usr/local/percona/pmm2/exporters/rds_exporter /usr/local/percona/pmm2/exporters/
 COPY packages/pgsql-10 /usr/pgsql-10
-COPY packages/pmm-server-2.0.0-beta6 /usr/share/pmm-server
-COPY packages/grafana-dashboards-2.0.0-beta6 /usr/share/percona-dashboards
+COPY packages/pmm-server-2.0.0 /usr/share/pmm-server
+COPY packages/grafana-dashboards-2.0.0 /usr/share/percona-dashboards
 COPY files/import-dashboards.py /usr/share/percona-dashboards/
 ADD deb/* /opt/deb/
 ENV DEBIAN_FRONTEND=noninteractive
 RUN dpkg -i /opt/deb/*.deb
-COPY packages/pmm-server-2.0.0-beta6/prometheus.yml /etc/prometheus.yml
+COPY packages/pmm-server-2.0.0/prometheus.yml /etc/prometheus.yml
 COPY files/clickhouse.xml /etc/clickhouse-server/config.xml
 COPY files/supervisord.conf /etc/supervisord.conf
 COPY files/pmm.ini /etc/supervisord.d/pmm.ini
@@ -60,15 +62,17 @@ COPY files/nginx.conf /etc/nginx/nginx.conf
 # I don't know where this comes from either
 COPY files/dashboards-VERSION /usr/share/percona-dashboards/VERSION
 COPY files/nginx-pmm.conf /etc/nginx/conf.d/pmm.conf
-COPY packages/pmm-server-2.0.0-beta6/nginx-ssl.conf /etc/nginx/conf.d/pmm-ssl.conf
+COPY packages/pmm-server-2.0.0/nginx-ssl.conf /etc/nginx/conf.d/pmm-ssl.conf
 COPY files/ca-certs.pem /srv/nginx/ca-certs.pem
 COPY files/certificate.key /srv/nginx/certificate.key
 COPY files/certificate.crt /srv/nginx/certificate.crt
 COPY files/certificate.conf /srv/nginx/certificate.conf
 COPY files/dhparam.pem /srv/nginx/dhparam.pem
 COPY files/entrypoint.sh /opt/entrypoint.sh
-COPY packages/pmm-server-2.0.0-beta6/tmpfiles.d-pmm.conf /etc/tmpfiles.d/pmm.conf
-RUN chmod 0755 /opt/entrypoint.sh /usr/share/percona-dashboards/import-dashboards.py
+COPY files/pmm-agent-wrapper /usr/sbin/pmm-agent-wrapper
+COPY packages/pmm-server-2.0.0/tmpfiles.d-pmm.conf /etc/tmpfiles.d/pmm.conf
+RUN chmod 0755 /opt/entrypoint.sh /usr/share/percona-dashboards/import-dashboards.py \
+    /usr/sbin/pmm-agent-wrapper
 RUN chmod 0644 /srv/nginx/*
 # hack!
 RUN sed -i 's/listen       80/listen 8888/g' /etc/nginx/conf.d/default.conf

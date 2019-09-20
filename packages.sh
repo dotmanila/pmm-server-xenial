@@ -27,12 +27,12 @@ mv -f pgsql pgsql-10
 wget https://github.com/prometheus/prometheus/releases/download/v2.12.0/prometheus-2.12.0.linux-amd64.tar.gz
 tar xzf prometheus-2.12.0.linux-amd64.tar.gz
 rm -rf prometheus-2.12.0.linux-amd64.tar.gz
-wget https://github.com/percona/pmm-server/archive/v2.0.0-beta6.tar.gz
-tar xzf v2.0.0-beta6.tar.gz
-rm -rf v2.0.0-beta6.tar.gz
-wget https://github.com/percona/grafana-dashboards/archive/v2.0.0-beta6.tar.gz
-tar xzf v2.0.0-beta6.tar.gz
-rm -rf v2.0.0-beta6.tar.gz
+wget https://github.com/percona/pmm-server/archive/v2.0.0.tar.gz
+tar xzf v2.0.0.tar.gz
+rm -rf v2.0.0.tar.gz
+wget https://github.com/percona/grafana-dashboards/archive/v2.0.0.tar.gz
+tar xzf v2.0.0.tar.gz
+rm -rf v2.0.0.tar.gz
 
 cd $(dirname $CWD)
 

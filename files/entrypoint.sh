@@ -32,8 +32,3 @@ if [ -z "${UPDATE_MODE}" ]; then
     exec supervisord -n -c /etc/supervisord.conf
 fi
 
-if [ ! -f  /usr/local/percona/pmm-agent.yaml ]; then
-    /usr/sbin/pmm-agent setup --config-file=/usr/local/percona/pmm-agent.yaml \
-        --server-address=127.0.0.1:8843 --server-insecure-tls --server-username=admin \
-        --server-password=admin
-fi
